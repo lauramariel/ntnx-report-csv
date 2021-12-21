@@ -20,7 +20,13 @@ This script generates a CSV report based on VM statistics in the V1 API, which i
 * Network - Data Transmit Rate (KBps) (Max)
 * Network - Data Transmit Rate (KBps) (Average)
 
-By default, it will generate a report based on the last 30 days. The `-d` flag can be used to specify a duration in days (which can be `0` if you want a current point-in-time report)
+It has the following features:
+* Includes both the max and average for each metric
+* Displays the metric name in a human readable format (e.g. controller_user_bytes becomes Guest File System Utilization (%))
+* Converts metric values into specific units (i.e. storage/memory in GiB, network traffic in KBps)
+* Ability to pass in a custom duration (last x days), default is 30 days
+
+By default, it will generate a report based on the last 30 days. The `-d` flag can be used to specify a duration in days (which can be `0` if you want a current point-in-time report) (see the [Usage](#usage) section)
 
 ## Setup
 
