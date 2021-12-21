@@ -1,0 +1,19 @@
+{
+    "config": {
+        "attributes": {
+            "vmName": "Name",
+            "clusterUuid": "Cluster Name",
+            "numVCpus": "Provisioned vCPUs",
+            "memoryCapacityInBytes": "Memory Capacity",
+            "diskCapacityInBytes": "Disk Capacity"
+        },
+        "metrics": {
+            "hypervisor_cpu_usage_ppm": "CPU Usage (%)",
+            "guest.memory_usage_bytes": "Memory Consumed (GiB)",
+            "memory_usage_ppm": "Memory Usage (%)",
+            "controller_user_bytes": "Guest File System Utilization (%)",
+            "hypervisor_num_received_bytes": "Network - Data Receive Rate (KBps)",
+            "hypervisor_num_transmitted_bytes": "Network - Data Transmit Rate (KBps)"
+        }
+    }
+}
