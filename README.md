@@ -125,4 +125,10 @@ On a 14-node cluster with 375 total VMs the script took ~16 minutes to run.
 
 ## Disclaimer
 
-Please see the .disclaimer file that is distributed with this repository.
+This script is unofficial and is not supported or actively maintained by Nutanix in any way.
+
+In addition, please also be advised that this script may contain code that may not follow best practices.  Please check through each script to ensure the configuration suits your requirements.
+
+**Changes may be required before this script can be used in production environments.**
+
+Please see the `.disclaimer` file distributed with this repository.
