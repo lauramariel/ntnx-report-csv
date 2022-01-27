@@ -11,6 +11,7 @@ import logging
 import argparse
 import getpass
 import re
+import math
 from base64 import b64encode
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -142,6 +143,14 @@ class NameFilter(logging.Filter):
         record.entity_name = self.entity_name
         return True
 
+def split_list(lst, n):
+    """
+    Function to yield successive n-sized chunks from a list.
+    Used for constructing multiple URLs depending on
+    number of metrics desired
+    """
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 def api_request(url, pe_ip, pe_user, pe_password):
     """Create a new entity via a v3 post call, return the response"""
@@ -291,12 +300,29 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
 
         logger.info(log_delimiter)
 
-        for vm_metric, display_name in metrics.items():
-            # query the API for the specified duration for the specific VM and
-            # metric, then calculate the max and average
+        # First we will construct the URL(s)
+        # We have to do multiple calls because only 5 metrics are supported at a time
+        metrics = []
+        for vm_metric in metrics.items():
+            metrics.append(vm_metric[0])
+
+        # first split the metric list into chunks of 5
+        # e.g. for 6 metrics we'll have two lists
+        # [
+        #   ['hypervisor_cpu_usage_ppm', 'guest.memory_usage_bytes', 'memory_usage_ppm', 
+        #        'controller_user_bytes', 'hypervisor_num_received_bytes'],
+        #   ['hypervisor_num_transmitted_bytes']
+        # ]
+        url_param_full_list = list(split_list(metrics, 5))
+
+        for params in url_param_full_list:
+            # turn list into a string
+            str_params = ','.join(map(str, params))
+            
+            print(str_params)
 
             if duration == 0:
-                metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}"
+                metric_url = f"{url}/{vm_uuid}/stats/?metrics={str_params}"
             else:
                 startTimeInUsecs = int(
                     (
@@ -304,16 +330,17 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                     ).timestamp()
                     * 1000000
                 )
-                metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}&" + \
+                metric_url = f"{url}/{vm_uuid}/stats/?metrics={str_params}&" + \
                     f"startTimeInUsecs={startTimeInUsecs}"
 
             metric_resp = api_request(metric_url, pe_ip, pe_user, pe_password)
             metric_results = metric_resp.json
 
-            logger.info(f"{display_name}: {metric_url}")
+            logger.info(f"URL: {metric_url}")
             logger.info(log_delimiter)
-
+            # left off here-ish 12/20/21
             if metric_results.get("statsSpecificResponses"):
+                # for one metric, there's only one element
                 for i in metric_results["statsSpecificResponses"]:
                     message = i["message"]
                     num_of_values = len(i["values"])
